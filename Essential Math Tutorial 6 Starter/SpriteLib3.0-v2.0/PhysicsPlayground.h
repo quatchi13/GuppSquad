@@ -21,6 +21,8 @@ public:
 
 	void makeStaticObject(std::string filename, int width, int height, int x, int y, int z, int physx, int physy, float shrinkX, float shrinkY, EntityCategories type, float r, float g, float b, float opacity, int rotate);
 
+	void makeDestroyTrigger(int length, int width, int x, int y, int z, int target, float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity);
+
 protected:
 	PhysicsPlaygroundListener listener;
 
