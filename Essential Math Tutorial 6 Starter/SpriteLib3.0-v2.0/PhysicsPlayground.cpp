@@ -166,14 +166,7 @@ void PhysicsPlayground::KeyboardHold()
 		speed *= 5.f;
 	}
 
-	if (Input::GetKey(Key::A))
-	{
-		player.GetBody()->ApplyForceToCenter(b2Vec2(-400000.f * speed, 0.f), true);
-	}
-	if (Input::GetKey(Key::D))
-	{
-		player.GetBody()->ApplyForceToCenter(b2Vec2(400000.f * speed, 0.f), true);
-	}
+	player.GetBody()->ApplyForceToCenter(b2Vec2(400000.f * speed, 0.f), true);
 
 	//Change physics body size for circle
 	if (Input::GetKey(Key::O))
