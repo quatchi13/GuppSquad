@@ -143,11 +143,6 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	makeStaticObject("boxSprite.jpg", 30, 5, 30, -30, 2, 1000, 20, 0, 0, ENVIRONMENT, 0, 1, 0, 0.3, 0);
 	
 
-
-
-
-	
-
 	//Setup trigger
 	makeDestroyTrigger(40, 40, 30, -20, 80, 7, 0, 0, 300, -30, TRIGGER, PLAYER, 1, 0, 0, 0.3);
 
