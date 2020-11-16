@@ -23,6 +23,7 @@ public:
 
 	void makeDestroyTrigger(int length, int width, int x, int y, int z, int target, float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity);
 
+	void makeEnemy(int x, int y, float physx, float physy, float shrinkx, float shrinky, int r, int g, int b, float opacity);
 protected:
 	PhysicsPlaygroundListener listener;
 
