@@ -8,16 +8,16 @@ void VerticalScroll::Update()
 {
 	if (m_focus->GetPosition().y > m_cam->m_localPosition.y + m_offset)
 	{
-		float difference = m_focus->GetPosition().y - (m_cam->m_localPosition.y + m_offset) + 45;
+		float difference = m_focus->GetPosition().y - (m_cam->m_localPosition.y + m_offset);
 
-		m_cam->SetPosition(vec3(m_cam->GetPosition().x, m_cam->GetPosition().y + difference, m_cam->GetPosition().z));
+		m_cam->SetPosition(vec3(m_cam->GetPosition().x, m_cam->GetPosition().y, m_cam->GetPosition().z));
 	}
 
 	if (m_focus->GetPosition().y < m_cam->m_localPosition.y - m_offset)
 	{
-		float difference = m_focus->GetPosition().y - (m_cam->m_localPosition.y - m_offset) + 35;
+		float difference = m_focus->GetPosition().y - (m_cam->m_localPosition.y - m_offset);
 
-		m_cam->SetPosition(vec3(m_cam->GetPosition().x, m_cam->GetPosition().y + difference, m_cam->GetPosition().z));
+		m_cam->SetPosition(vec3(m_cam->GetPosition().x, m_cam->GetPosition().y, m_cam->GetPosition().z));
 	}
 }
 

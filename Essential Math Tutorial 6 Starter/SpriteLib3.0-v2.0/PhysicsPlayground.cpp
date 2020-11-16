@@ -44,7 +44,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		ECS::GetComponent<Camera>(entity).SetWindowSize(vec2(float(windowWidth), float(windowHeight)));
 		ECS::GetComponent<Camera>(entity).Orthographic(aspectRatio, temp.x, temp.y, temp.z, temp.w, -100.f, 100.f);
 
-		ECS::GetComponent<Camera>(entity).SetPosition( 50, 50, 50);
+		ECS::GetComponent<Camera>(entity).SetPosition( 50, 40, 50);
 
 		//Attaches the camera to vert and horiz scrolls
 		ECS::GetComponent<HorizontalScroll>(entity).SetCam(&ECS::GetComponent<Camera>(entity));
@@ -65,8 +65,8 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		ECS::AttachComponent<CanJump>(entity);
 
 		//Sets up the components
-		std::string fileName = "LinkStandby.png";
-		ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 40, 30);
+		std::string fileName = "Concept_Design_PLAYER.png";
+		ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 10, 25);
 		ECS::GetComponent<Sprite>(entity).SetTransparency(1.f);
 		ECS::GetComponent<Transform>(entity).SetPosition(vec3(0.f, 30.f, 2.f));
 
@@ -79,12 +79,12 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		b2Body* tempBody;
 		b2BodyDef tempDef;
 		tempDef.type = b2_dynamicBody;
-		tempDef.position.Set(float32(0.f), float32(30.f));
+		tempDef.position.Set(float32(0.f), float32(15.f));
 
 		tempBody = m_physicsWorld->CreateBody(&tempDef);
 
-		//tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.f);
-		tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetHeight() - shrinkY)/2.f), vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.f);
+		tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(-2.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.f);
+		//tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetHeight() - shrinkY)/2.f), vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.f);
 		//std::vector<b2Vec2> points = { b2Vec2(-tempSpr.GetWidth() / 2.f, -tempSpr.GetHeight() / 2.f), b2Vec2(tempSpr.GetWidth() / 2.f, -tempSpr.GetHeight() / 2.f), b2Vec2(0, tempSpr.GetHeight() / 2.f) };
 		//tempPhsBody = PhysicsBody(entity, BodyType::TRIANGLE, tempBody, points, vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.5);
 		tempPhsBody.SetRotationAngleDeg(0.f);
@@ -96,48 +96,14 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	makeImage("HelloWorld.png", 100, 80, 0.5, 0, 0, 0);
 
 	//Setup static Top Platform
-	makeStaticObject("boxSprite.jpg", 150, 10, 30, -20, 2, 30, -10, 0, 0, GROUND, 0, 1, 0, 0.3, 0);
-	makeStaticObject("boxSprite.jpg", 80, 10, 30, -20, 2, 137.1, -29.3, 0, 0, GROUND, 0, 1, 0, 0.3, -30);
-	makeStaticObject("boxSprite.jpg", 150, 10, 30, -20, 2, 240, -50, 0, 0, GROUND, 0, 1, 0, 0.3, 0);
-	makeStaticObject("boxSprite.jpg", 50, 15, 30, -20, 2, 325, -30, 0, 0, ENVIRONMENT, 0, 1, 0, 0.3, 90);
+	makeStaticObject("boxSprite.jpg", 15000000, 5, 30, -30, 2, 0, 0, 0, 0, GROUND, 0, 1, 0, 0.3, 0);
+
 	
 
 
 
 
-	//Ball
-	{
-		auto entity = ECS::CreateEntity();
-		ball = entity;
-		//Add components
-		ECS::AttachComponent<Sprite>(entity);
-		ECS::AttachComponent<Transform>(entity);
-		ECS::AttachComponent<PhysicsBody>(entity);
-
-		//Sets up the components
-		std::string fileName = "BeachBall.png";
-		ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 20, 20);
-		ECS::GetComponent<Sprite>(entity).SetTransparency(1.f);
-		ECS::GetComponent<Transform>(entity).SetPosition(vec3(45.f, -8.f, 3.f));
-
-		auto& tempSpr = ECS::GetComponent<Sprite>(entity);
-		auto& tempPhsBody = ECS::GetComponent<PhysicsBody>(entity);
-
-		float shrinkX = 0.f;
-		float shrinkY = 0.f;
-
-		b2Body* tempBody;
-		b2BodyDef tempDef;
-		tempDef.type = b2_dynamicBody;
-		tempDef.position.Set(float32(45.f), float32(-8.f));
-
-		tempBody = m_physicsWorld->CreateBody(&tempDef);
-
-		//tempPhsBody = PhysicsBody(tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(0.f, 0.f), false);
-		tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetWidth() - shrinkY) / 2.f), vec2(0.f, 0.f), false, OBJECTS, GROUND | ENVIRONMENT | PLAYER | TRIGGER, 0.3f);
-
-		tempPhsBody.SetColor(vec4(1.f, 0.f, 1.f, 0.3f));
-	}
+	
 
 	//Setup trigger
 	makeDestroyTrigger(40, 40, 30, -20, 80, 7, 0, 0, 300, -30, TRIGGER, PLAYER, 1, 0, 0, 0.3);
@@ -166,7 +132,14 @@ void PhysicsPlayground::KeyboardHold()
 		speed *= 5.f;
 	}
 
-	player.GetBody()->ApplyForceToCenter(b2Vec2(400000.f * speed, 0.f), true);
+	if (Input::GetKey(Key::A))
+	{
+		player.GetBody()->ApplyForceToCenter(b2Vec2(-400000.f * speed, 0.f), true);
+	}
+	
+
+		player.GetBody()->ApplyForceToCenter(b2Vec2(400000.f * speed, 0.f), true);
+	
 
 	//Change physics body size for circle
 	if (Input::GetKey(Key::O))
