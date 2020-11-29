@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Vector.h"
 #include "Scene.h"
 #include "PhysicsPlaygroundListener.h"
 
@@ -21,18 +21,19 @@ public:
 
 	void makeStaticObject(std::string filename, int width, int height, int x, int y, int z, int physx, int physy, float shrinkX, float shrinkY, EntityCategories type, float r, float g, float b, float opacity, int rotate);
 
-	void makeDestroyTrigger(int length, int width, int x, int y, int z, int targets[], float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity);
+	void makeDestroyTrigger(int length, int width, int x, int y, int z, std::vector<int> targets, float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity);
 
 	void makeEnemy(int x, int y, float physx, float physy, float shrinkx, float shrinky, int r, int g, int b, float opacity);
 
-	void makeBullet(std::string fileName, vec3 source, int shrinkX, int shrinkY);
+	int makeBullet();
 
-	void fireBullet(int shotSpeed);
+	void fireBullet();
 
 protected:
 	PhysicsPlaygroundListener listener;
 
 	int hostileBullets[1];
 
-	int ball = 0;
+	int tempBullet;
+	int bullet = 0;
 };
