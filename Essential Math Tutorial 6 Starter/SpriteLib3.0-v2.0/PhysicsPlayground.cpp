@@ -1,5 +1,6 @@
 #include "PhysicsPlayground.h"
 #include "Utilities.h"
+#include "Vector.h"
 #include <random>
 
 
@@ -93,7 +94,49 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		tempPhsBody.SetGravityScale(2.f);
 	}
 
-	
+	{
+		for (int i = 0; i < 1; i++) {
+			std::string fileName = "LinkStandby.png";
+			int x, y;
+
+			switch (i) {
+			case 0:
+				x = 390;
+				y = 55;
+			}
+
+			auto entity = ECS::CreateEntity();
+			hostileBullets[i] = entity;
+
+			ball = entity;
+
+			ECS::AttachComponent<Sprite>(entity);
+			ECS::AttachComponent<Transform>(entity);
+			ECS::AttachComponent<PhysicsBody>(entity);
+
+			ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 5, 5);
+			ECS::GetComponent<Transform>(entity).SetPosition(100, 50, 3);
+
+			auto& tempSpr = ECS::GetComponent<Sprite>(entity);
+
+			tempSpr.SetTransparency(0.f);
+
+			auto& tempPhsBody = ECS::GetComponent<PhysicsBody>(entity);
+
+			b2Body* tempBody;
+			b2BodyDef tempDef;
+			tempDef.type = b2_dynamicBody;
+			tempDef.position.Set(x, y);
+
+			tempBody = m_physicsWorld->CreateBody(&tempDef);
+
+			tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetWidth()) / 2.f), vec2(0.f, 0.f), false, BULLET, PLAYER);
+			tempPhsBody.SetColor(vec4(1, 0, 0, 0.3));
+			tempPhsBody.SetRotationAngleDeg(0);
+			tempPhsBody.SetGravityScale(0.f);
+
+		}
+	}
 
 	makeImage("Background.png", 20000, 1000, 1, 8800, 10, -4);
 
@@ -133,7 +176,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	
 
 	//Setup trigger
-	//makeDestroyTrigger(40, 40, 30, -20, 80, 7, 0, 0, 300, -30, TRIGGER, PLAYER, 1, 0, 0, 0.3);
+	makeDestroyTrigger(40, 80, 30, -20, 80, hostileBullets, 0, 0, 300, -30, TRIGGER, PLAYER, 1, 0, 0, 0.3);
 
 	ECS::GetComponent<HorizontalScroll>(MainEntities::MainCamera()).SetFocus(&ECS::GetComponent<Transform>(MainEntities::MainPlayer()));
 	ECS::GetComponent<VerticalScroll>(MainEntities::MainCamera()).SetFocus(&ECS::GetComponent<Transform>(MainEntities::MainPlayer()));
@@ -257,7 +300,7 @@ void PhysicsPlayground::makeStaticObject(std::string filename, int width, int he
 }
 
 
-void PhysicsPlayground::makeDestroyTrigger(int length, int width, int x, int y, int z, int target, float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity)
+void PhysicsPlayground::makeDestroyTrigger(int length, int width, int x, int y, int z, int targets[], float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity)
 {
 	//Creates entity
 	auto entity = ECS::CreateEntity();
@@ -275,7 +318,11 @@ void PhysicsPlayground::makeDestroyTrigger(int length, int width, int x, int y, 
 	ECS::GetComponent<Transform>(entity).SetPosition(vec3(x, y, z));
 	ECS::GetComponent<Trigger*>(entity) = new DestroyTrigger();
 	ECS::GetComponent<Trigger*>(entity)->SetTriggerEntity(entity);
-	ECS::GetComponent<Trigger*>(entity)->AddTargetEntity(target);
+	std::vector <int> shots;
+	for (int i = 0; i < 1; i++) {
+		shots.push_back(targets[i]);
+	}
+	ECS::GetComponent<Trigger*>(entity)->SetTargetEntities(shots);
 
 	auto& tempSpr = ECS::GetComponent<Sprite>(entity);
 	auto& tempPhsBody = ECS::GetComponent<PhysicsBody>(entity);
