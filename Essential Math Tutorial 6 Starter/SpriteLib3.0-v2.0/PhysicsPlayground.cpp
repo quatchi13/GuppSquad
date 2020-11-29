@@ -193,6 +193,7 @@ void PhysicsPlayground::Update()
 void PhysicsPlayground::KeyboardHold()
 {
 	auto& player = ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer());
+	auto& canJump = ECS::GetComponent<CanJump>(MainEntities::MainPlayer());
 
 	float speed = 0.6f;
 	b2Vec2 vel = b2Vec2(0.f, 0.f);
@@ -202,7 +203,15 @@ void PhysicsPlayground::KeyboardHold()
 		player.GetBody()->ApplyForceToCenter(b2Vec2(-500000.f * speed, 0.f), true);
 	}
 	
+	if (canJump.m_canJump) 
+	{
+		player.GetBody()->ApplyForceToCenter(b2Vec2(300000.f * speed, 0.f), true);
+	}
+	else
+	{
 		player.GetBody()->ApplyForceToCenter(b2Vec2(200000.f * speed, 0.f), true);
+	}
+	
 	
 		
 
