@@ -21,19 +21,27 @@ public:
 
 	void makeStaticObject(std::string filename, int width, int height, int x, int y, int z, int physx, int physy, float shrinkX, float shrinkY, EntityCategories type, float r, float g, float b, float opacity, int rotate);
 
-	void makeDestroyTrigger(int length, int width, int x, int y, int z, std::vector<int> targets, float shrinkX, float shrinkY, int physX, int physY, EntityCategories type, EntityCategories canActivate, float r, float g, float b, float opacity);
+	void makeShotTrigger(int index, int x, int y, int z, int target, int physX, int physY);
 
-	void makeEnemy(int x, int y, float physx, float physy, float shrinkx, float shrinky, int r, int g, int b, float opacity);
+	void makeEnemy(int index, int x, int y, float physx, float physy, float shrinkx, float shrinky, int r, int g, int b, float opacity);
 
-	int makeBullet();
+	void makeBullet(int index);
 
 	void fireBullet();
 
 protected:
 	PhysicsPlaygroundListener listener;
 
-	int hostileBullets[1];
-
+	int spawnCount = 0;
 	int tempBullet;
-	int bullet = 0;
+	std::vector <int> bullet{ 0 };
+	std::vector <int> enemies{ 0 };
+	std::vector <int> shotTriggers{ 0 };
+	std::vector <int> hostileBullets{ 0 };
+	
+	int deletedBullets = 0;
+	int deletedEnemies = 0;
+	int dummy = 0;
+
+	int score = 0;
 };

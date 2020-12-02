@@ -5,7 +5,6 @@
 class DestroyTrigger : public Trigger
 {
 public:
-	void OnTrigger() override;
 
 	void OnEnter() override;
 	void OnExit() override;

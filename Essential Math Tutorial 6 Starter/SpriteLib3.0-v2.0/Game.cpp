@@ -2,6 +2,10 @@
 
 #include <random>
 
+const int fps = 60;
+const int frameDelay = 1000 / fps;
+Uint32 frameStart;
+int frameTime;
 
 Game::~Game()
 {
@@ -57,6 +61,9 @@ bool Game::Run()
 	//While window is still open
 	while (m_window->isOpen())
 	{
+		frameStart = SDL_GetTicks();
+
+
 		//Clear window with activescene clearColor
 		m_window->Clear(m_activeScene->GetClearColor());
 		//Updates the game
@@ -80,6 +87,12 @@ bool Game::Run()
 		{
 			//Accept all input
 			AcceptInput();
+		}
+
+		frameTime = SDL_GetTicks() - frameStart;
+		
+		if (frameDelay > frameTime) {
+			SDL_Delay(frameDelay - frameTime);
 		}
 	}
 
