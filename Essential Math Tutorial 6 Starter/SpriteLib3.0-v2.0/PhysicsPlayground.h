@@ -21,7 +21,7 @@ public:
 
 	void makeStaticObject(std::string filename, int width, int height, int x, int y, int z, int physx, int physy, float shrinkX, float shrinkY, EntityCategories type, float r, float g, float b, float opacity, int rotate);
 
-	void makeShotTrigger(int index, int x, int y, int z, int target, int physX, int physY);
+	void makeShotTrigger(int index, int x, int y, int z, int physX, int physY);
 
 	void makeEnemy(int index, int x, int y, float physx, float physy, float shrinkx, float shrinky, int r, int g, int b, float opacity);
 

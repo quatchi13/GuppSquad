@@ -189,8 +189,8 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	}
 	
 	//Setup trigger
-	makeShotTrigger(0, 30, -20, 80, hostileBullets[0], 280, -30);
-	makeShotTrigger(1, 30, -20, 80, hostileBullets[1], 880, -30);
+	makeShotTrigger(0, 30, -20, 80, 280, -30);
+	makeShotTrigger(1, 30, -20, 80, 880, -30);
 	//makeTriggerEnemy(0, 400, 22, shotTriggers[0]);
 
 	ECS::GetComponent<HorizontalScroll>(MainEntities::MainCamera()).SetFocus(&ECS::GetComponent<Transform>(MainEntities::MainPlayer()));
@@ -242,7 +242,7 @@ void PhysicsPlayground::Update()
 						deletedBullets++;
 
 						score += 500;
-						std::cout << '\n' << score;
+						std::cout << '\n' << score << '\n';
 					}
 				}
 			}
@@ -397,7 +397,7 @@ void PhysicsPlayground::makeStaticObject(std::string filename, int width, int he
 }
 
 
-void PhysicsPlayground::makeShotTrigger(int index, int x, int y, int z, int target, int physX, int physY)
+void PhysicsPlayground::makeShotTrigger(int index, int x, int y, int z, int physX, int physY)
 {
 	//Creates entity
 	auto entity = ECS::CreateEntity();
