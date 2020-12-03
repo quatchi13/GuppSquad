@@ -43,7 +43,7 @@ void Game::InitGame()
 	m_scenes.push_back(new FirstCreation("FIRST SCENE!!!!"));
 	m_scenes.push_back(new PhysicsPlayground("Pistol Whip"));
 	m_scenes.push_back(new AnimationSpritePlayground("Animation TIEM!!!!"));
-	 
+
 	//Sets active scene reference to our scene
 	m_activeScene = m_scenes[1];
 
@@ -90,8 +90,7 @@ bool Game::Run()
 		}
 		frameTime = SDL_GetTicks() - frameStart;
 
-		if (frameDelay > frameTime)
-		{
+		if (frameDelay > frameTime) {
 			SDL_Delay(frameDelay - frameTime);
 		}
 	}
@@ -181,35 +180,35 @@ void Game::GamepadInput()
 	}
 }
 
-void Game::GamepadStroke(XInputController * con)
+void Game::GamepadStroke(XInputController* con)
 {
 	//Active scene now captures this input and can use it
 	//Look at base Scene class for more info.
 	m_activeScene->GamepadStroke(con);
 }
 
-void Game::GamepadUp(XInputController * con)
+void Game::GamepadUp(XInputController* con)
 {
 	//Active scene now captures this input and can use it
 	//Look at base Scene class for more info.
 	m_activeScene->GamepadUp(con);
 }
 
-void Game::GamepadDown(XInputController * con)
+void Game::GamepadDown(XInputController* con)
 {
 	//Active scene now captures this input and can use it
 	//Look at base Scene class for more info.
 	m_activeScene->GamepadDown(con);
 }
 
-void Game::GamepadStick(XInputController * con)
+void Game::GamepadStick(XInputController* con)
 {
 	//Active scene now captures this input and can use it
 	//Look at base Scene class for more info.
 	m_activeScene->GamepadStick(con);
 }
 
-void Game::GamepadTrigger(XInputController * con)
+void Game::GamepadTrigger(XInputController* con)
 {
 	//Active scene now captures this input and can use it
 	//Look at base Scene class for more info.
