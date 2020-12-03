@@ -9,7 +9,12 @@ public:
 
 	void BeginContact(b2Contact* contact) override;
 	void EndContact(b2Contact* contact) override;
+	void SetTimer(int set);
+	void AddTime(float add);
+	float GetTimer();
+	
 private:
+	float timer = 0;
 	void TriggerEnter(b2Fixture* sensor);
 	void TriggerExit(b2Fixture* sensor);
 };

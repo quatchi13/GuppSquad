@@ -1,4 +1,5 @@
 #include "PhysicsPlayground.h"
+#include "PhysicsPlaygroundListener.h"
 #include "Utilities.h"
 #include "Vector.h"
 #include <vector>
@@ -17,6 +18,8 @@ PhysicsPlayground::PhysicsPlayground(std::string name)
 void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 {
 	PlaySound(TEXT("music.wav"), NULL, SND_ASYNC);
+
+
 
 	//Dynamically allocates the register
 	m_sceneReg = new entt::registry;
@@ -84,11 +87,14 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 
 		tempBody = m_physicsWorld->CreateBody(&tempDef);
 
-		tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(-2.f, 0.f), false, PLAYER, GROUND | TRIGGER, 0.5f, 3.f);
+		tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(-2.f, 0.f), false, PLAYER, GROUND | TRIGGER, 0.f, 3.f);
+		//tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetHeight() - shrinkY)/2.f), vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.f);
+		//std::vector<b2Vec2> points = { b2Vec2(-tempSpr.GetWidth() / 2.f, -tempSpr.GetHeight() / 2.f), b2Vec2(tempSpr.GetWidth() / 2.f, -tempSpr.GetHeight() / 2.f), b2Vec2(0, tempSpr.GetHeight() / 2.f) };
+		//tempPhsBody = PhysicsBody(entity, BodyType::TRIANGLE, tempBody, points, vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.5);
 		tempPhsBody.SetRotationAngleDeg(0.f);
 		tempPhsBody.SetFixedRotation(true);
 		tempPhsBody.SetColor(vec4(1.f, 0.f, 1.f, 0.3f));
-		tempPhsBody.SetGravityScale(2.f);
+		tempPhsBody.SetGravityScale(10.f);
 	}
 
 	{
@@ -175,7 +181,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	makeEnemy(13, 18, 25, 4700, -28, 0, 0, 1, 0, 0, 0.3);
 	makeEnemy(14, 18, 25, 4750, 38, 0, 0, 1, 0, 0, 0.3);*/
 
-	for (int i = 0; i < 200; i++) {
+	for (int i = 0; i < 182; i++) {
 		auto entity = ECS::CreateEntity();
 		bullet.push_back(entity);
 		
@@ -184,7 +190,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 			bullet.erase(bullet.begin());
 		}
 	}
-	for (int i = 0; i < 200; i++) {
+	for (int i = 0; i < 182; i++) {
 		makeBullet(i);
 	}
 	
@@ -201,93 +207,18 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 
 void PhysicsPlayground::Update()
 {
-	bulletStuff:
 	
-	int active = spawnCount - deletedBullets;
-	bool hasDespawned;
-
-
-	if (active > 0) {
-		for (int i = deletedBullets; i < spawnCount; i++) {
-			
-			hasDespawned = false;
-			auto& bPos = ECS::GetComponent<PhysicsBody>(bullet[i]);
-			
-			for (int j = 0; j < enemies.size(); j++) {
-				if (!hasDespawned) {
-
-					auto& ePos = ECS::GetComponent<PhysicsBody>(enemies[j]);
-					int maxX = ePos.GetBody()->GetPosition().x + 13;
-					int minX = ePos.GetBody()->GetPosition().x - 13;
-					int maxY = ePos.GetBody()->GetPosition().y + 9;
-					int minY = ePos.GetBody()->GetPosition().y - 9;
-
-
-					if (bPos.GetBody()->GetPosition().x < maxX && bPos.GetBody()->GetPosition().x > minX
-						&& bPos.GetBody()->GetPosition().y < maxY && bPos.GetBody()->GetPosition().y > minY) {
-						
-						if (ECS::GetComponent<PhysicsBody>(hostileBullets[j]).GetVelocity().x == 0) {
-							ECS::DestroyEntity(hostileBullets[j]);
-							hostileBullets.erase(hostileBullets.begin() + j);
-						}
-						
-						ECS::GetComponent<PhysicsBody>(shotTriggers[j]).SetPosition(b2Vec2(-5.f, 0.f));
-						shotTriggers.erase(shotTriggers.begin() + j);
-						ECS::DestroyEntity(enemies[j]);
-						enemies.erase(enemies.begin() + j);
-						ECS::DestroyEntity(bullet[i]);
-						bullet.erase(bullet.begin() + i);
-
-						hasDespawned = true;
-						deletedBullets++;
-
-						score += 500;
-						std::cout << '\n' << score << '\n';
-					}
-				}
-			}
-
-			if (!hasDespawned) {
-					auto& player = ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer());
-					if (bPos.GetBody()->GetPosition().x < (player.GetBody()->GetPosition().x - 60) 
-						|| bPos.GetBody()->GetPosition().x > (player.GetBody()->GetPosition().x + 200)
-						|| bPos.GetBody()->GetPosition().y < (player.GetBody()->GetPosition().y - 60) 
-						|| bPos.GetBody()->GetPosition().y > (player.GetBody()->GetPosition().y + 200)) {
-						
-						ECS::DestroyEntity(bullet[i]);
-						bullet.erase(bullet.begin() + i);
-						hasDespawned = true;
-						deletedBullets++;
-					}
-
-				}
-
-			if (hasDespawned) {
-				std::cout << "\nzap!\n";
-				goto bulletStuff;
-			}
-		}
-
-		//std::cout << '\n' << bullet[0] << " " << enemies[0] << " " << shotTriggers[0];
-
-	}
-
-
 }
-
+PhysicsPlaygroundListener timer;
 
 void PhysicsPlayground::KeyboardHold()
 {
 	auto& player = ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer());
 	auto& canJump = ECS::GetComponent<CanJump>(MainEntities::MainPlayer());
-
-	float speed = 0.6f;
-	b2Vec2 vel = b2Vec2(0.f, 0.f);
-	vec3 velocity(90, 0, 0);
-
-	player.SetVelocity(vec3(90, 0, 0));
 	
-
+	float speed = 0.6f;
+	int vel = 0;
+	vec3 velocity(90, 0, 0);
 
 	if (Input::GetKey(Key::A))
 	{
@@ -297,16 +228,36 @@ void PhysicsPlayground::KeyboardHold()
 		//std::cout << bullet[0] << " " << enemies[0] << " " << shotTriggers[0] << '\n';
 		//std::cout << bullet[1] << " " << enemies[1] << " " << shotTriggers[1] << '\n';
 	}
-	
-	if (canJump.m_canJump) 
-	{
-		player.GetBody()->ApplyForceToCenter(b2Vec2(300000.f * speed, 0.f), true);
+	if (player.GetPosition().y <= 20.015) {
+		canJump.m_canJump = true;
 	}
-	else
+	if (canJump.m_canJump)
 	{
-		player.GetBody()->ApplyForceToCenter(b2Vec2(200000.f * speed, 0.f), true);
+		if (player.GetPosition().y <= 20.015) {
+			timer.SetTimer(0);
+		}
+		if (Input::GetKey(Key::Space))
+		{
+			if (timer.GetTimer() < 0.4) {
+				 timer.AddTime(Timer::deltaTime);
+				vel += 70;
+			}
+			else
+			{
+				canJump.m_canJump = false;
+			}
+			
+		}
+		else
+		{
+			canJump.m_canJump = false;
+		}
 	}
-	
+	if (Input::GetKey(Key::U))
+	{
+		std::cout << player.GetPosition().y;
+	}
+	player.SetVelocity(vec3(90, vel, 0));
 }
 
 void PhysicsPlayground::KeyboardDown()
@@ -323,16 +274,7 @@ void PhysicsPlayground::KeyboardDown()
 	{
 		PhysicsBody::SetDraw(!PhysicsBody::GetDraw());
 	}
-	if (canJump.m_canJump)
-	{
-		if (Input::GetKeyDown(Key::Space))
-		{
-			player.GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.f, 200000.f), true);
-
-
-			canJump.m_canJump = false;
-		}
-	}
+	
 
 	if (Input::GetKeyDown(Key::S)) {
 		fireBullet();

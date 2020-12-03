@@ -1,5 +1,4 @@
 #include "PhysicsPlaygroundListener.h"
-
 #include "ECS.h"
 
 PhysicsPlaygroundListener::PhysicsPlaygroundListener()
@@ -16,6 +15,7 @@ void PhysicsPlaygroundListener::BeginContact(b2Contact* contact)
 	bool sensorA = fixtureA->IsSensor();
 	bool sensorB = fixtureB->IsSensor();
 
+	
 	//if neither or both are sensors, will be false
 	if ((sensorA ^ sensorB))
 	{
@@ -37,10 +37,13 @@ void PhysicsPlaygroundListener::BeginContact(b2Contact* contact)
 		if (filterA.categoryBits == PLAYER)
 		{
 			ECS::GetComponent<CanJump>((int)fixtureA->GetBody()->GetUserData()).m_canJump = true;
+			
+			
 		}
 		else if (filterB.categoryBits == PLAYER)
 		{
 			ECS::GetComponent<CanJump>((int)fixtureB->GetBody()->GetUserData()).m_canJump = true;
+			
 		}
 	}
 
@@ -68,6 +71,21 @@ void PhysicsPlaygroundListener::EndContact(b2Contact* contact)
 	}
 }
 
+void PhysicsPlaygroundListener::SetTimer(int start)
+{
+	timer = start;
+}
+
+void PhysicsPlaygroundListener::AddTime(float add)
+{
+	timer += add;
+}
+
+float PhysicsPlaygroundListener::GetTimer()
+{
+	return timer;
+}
+
 void PhysicsPlaygroundListener::TriggerEnter(b2Fixture* sensor)
 {
 	int entity = (int)sensor->GetBody()->GetUserData();
@@ -81,3 +99,5 @@ void PhysicsPlaygroundListener::TriggerExit(b2Fixture* sensor)
 
 	ECS::GetComponent<Trigger*>(entity)->OnExit();
 }
+
+
