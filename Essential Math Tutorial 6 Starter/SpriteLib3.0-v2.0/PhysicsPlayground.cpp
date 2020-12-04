@@ -23,7 +23,7 @@ PhysicsPlayground::PhysicsPlayground(std::string name)
 
 void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 {
-	PlaySound(TEXT("music.wav"), NULL, SND_ASYNC);
+	
 
 
 
@@ -155,7 +155,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	makeMovingBarrier(30, -20, 2, 235, 0);
 	makeMovingBarrier(30, -20, 2, -50, 0);
 
-	makeImage("Background.png", 20000, 1000, 1, 8800, 10, -4);
+	makeImage("Background.png", 3000, 250, 1, 850, 0, -4);
 
 	//Setup static Top Platform
 	makeStaticObject("White_Platform.png", 15000000, 15, 30, -30, 2, 0, 0, 0, 0, GROUND, 0, 1, 0, 0.3, 0);
@@ -410,7 +410,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	ECS::GetComponent<HorizontalScroll>(MainEntities::MainCamera()).SetFocus(&ECS::GetComponent<Transform>(MainEntities::MainPlayer()));
 	ECS::GetComponent<VerticalScroll>(MainEntities::MainCamera()).SetFocus(&ECS::GetComponent<Transform>(MainEntities::MainPlayer()));
 
-	
+	PlaySound(TEXT("music.wav"), NULL, SND_ASYNC);
 }
 
 void PhysicsPlayground::Update()
