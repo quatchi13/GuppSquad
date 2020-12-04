@@ -27,7 +27,10 @@ enum EntityCategories
 	ENEMY		= 0x0020,
 	PICKUP		= 0x0040,
 	TRIGGER		= 0x0080,
-	BULLET      = 0x0100
+	BULLET      = 0x0100,
+	EBULLET = 0x0200,
+	BOUNDARY = 0x0200,
+
 };
 
 

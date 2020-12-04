@@ -6,11 +6,23 @@
 class PhysicsPlayground : public Scene
 {
 public:
+	PhysicsPlayground();
+
 	PhysicsPlayground(std::string name);
 
 	void InitScene(float windowWidth, float windowHeight) override;
 
 	void Update() override;
+
+	void Aiming(vec2 mousePosition);
+
+	void MouseMotion(SDL_MouseMotionEvent evnt);
+
+	void MouseDown(SDL_MouseButtonEvent evnt);
+
+	void MouseClick(SDL_MouseButtonEvent evnt);
+
+	//void MouseEvent(SDL_MouseButtonEvent evnt);
 	
 	//Input overrides
 	void KeyboardHold() override;
@@ -27,16 +39,23 @@ public:
 
 	void makeBullet(int index);
 
+	void makeMovingBarrier(int x, int y, int z, int physx, int physy);
+
+	b2Vec2 mouseLocation;
+
 	void fireBullet();
 
+	std::vector <int> bullet{ 0 };
 protected:
 	PhysicsPlaygroundListener listener;
 
 	int spawnCount = 0;
 	int tempBullet;
-	
-	std::vector <int> bullet{ 0 };
+	int vectorPush;
+
 	std::vector <int> enemies{ 0 };
+	std::vector <int> activeBullets{ 0 };
+	std::vector <int> bulletHold{ 0 };
 	std::vector <int> shotTriggers{ 0 };
 	std::vector <int> hostileBullets{ 0 };
 	
@@ -45,4 +64,6 @@ protected:
 	int dummy = 0;
 
 	int score = 0;
+
+	
 };

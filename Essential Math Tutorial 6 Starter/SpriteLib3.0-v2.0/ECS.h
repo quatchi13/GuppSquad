@@ -14,6 +14,8 @@
 #include "EnemyShotTrigger.h"
 #include "HorizontalScroll.h"
 #include "CanJump.h"
+#include "ToBeDestroyed.h"
+#include "IsInactive.h"
 
 
 class ECS abstract
@@ -52,9 +54,9 @@ public:
 	//Side stuff for entity identifier
 	static void SetIsMainCamera(unsigned entity, bool mainCamera);
 	static void SetIsMainPlayer(unsigned entity, bool mainPlayer);
-
-private:
 	static entt::registry* m_reg;
+private:
+	
 };
 
 template<typename T>

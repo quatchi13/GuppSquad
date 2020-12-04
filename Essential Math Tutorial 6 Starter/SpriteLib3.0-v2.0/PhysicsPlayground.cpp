@@ -4,7 +4,13 @@
 #include "Vector.h"
 #include <vector>
 #include <random>
+#include "Bullet.h"
+#include "BulletPool.h"
 
+
+PhysicsPlayground::PhysicsPlayground()
+{
+}
 
 PhysicsPlayground::PhysicsPlayground(std::string name)
 	: Scene(name)
@@ -87,7 +93,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 
 		tempBody = m_physicsWorld->CreateBody(&tempDef);
 
-		tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(-2.f, 0.f), false, PLAYER, GROUND | TRIGGER, 0.f, 3.f);
+		tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkX), float(tempSpr.GetHeight() - shrinkY), vec2(-2.f, 0.f), false, PLAYER, GROUND | TRIGGER | EBULLET, 0.f, 3.f);
 		//tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetHeight() - shrinkY)/2.f), vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.f);
 		//std::vector<b2Vec2> points = { b2Vec2(-tempSpr.GetWidth() / 2.f, -tempSpr.GetHeight() / 2.f), b2Vec2(tempSpr.GetWidth() / 2.f, -tempSpr.GetHeight() / 2.f), b2Vec2(0, tempSpr.GetHeight() / 2.f) };
 		//tempPhsBody = PhysicsBody(entity, BodyType::TRIANGLE, tempBody, points, vec2(0.f, 0.f), false, PLAYER, ENEMY | OBJECTS | PICKUP | TRIGGER, 0.5f, 3.5);
@@ -136,7 +142,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 
 			tempBody = m_physicsWorld->CreateBody(&tempDef);
 
-			tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetWidth()) / 2.f), vec2(0.f, 0.f), false, BULLET, PLAYER);
+			tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetWidth()) / 2.f), vec2(0.f, 0.f), false, EBULLET, PLAYER);
 			tempPhsBody.SetColor(vec4(1, 0, 0, 0.3));
 			tempPhsBody.SetRotationAngleDeg(0);
 			tempPhsBody.SetGravityScale(0.f);
@@ -144,6 +150,10 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		}
 	}
 
+	makeStaticObject("nothingness.png", 15000000, 10, 30, -20, 2, 0, 115, 0, 0, BOUNDARY, 1, 3, 0, 0.3, 0);
+	makeStaticObject("nothingness.png", 15000000, 10, 30, -20, 2, 0, -35, 0, 0, BOUNDARY, 1, 3, 0, 0.3, 0);
+	makeMovingBarrier(30, -20, 2, 235, 0);
+	makeMovingBarrier(30, -20, 2, -50, 0);
 
 	makeImage("Background.png", 20000, 1000, 1, 8800, 10, -4);
 
@@ -385,19 +395,13 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	makeEnemy(93, 18, 25, 13800, 32, 0, 0, 1, 0, 0, 0.3);
 	makeEnemy(94, 18, 25, 13900, 32, 0, 0, 1, 0, 0, 0.3);
 
-	for (int i = 0; i < 60; i++) {
+	for (int i = 0; i < 5; i++)
+	{
 		auto entity = ECS::CreateEntity();
-		bullet.push_back(entity);
-		
+		bulletHold.push_back(entity);
 
-		if (i == 0) {
-			bullet.erase(bullet.begin());
-		}
+		makeBullet(i + 1);
 	}
-	for (int i = 0; i < 60; i++) {
-		makeBullet(i);
-	}
-	
 	//Setup trigger
 	makeShotTrigger(0, 30, -20, 80, 280, -30);
 	makeShotTrigger(1, 30, -20, 80, 700, -30);
@@ -411,80 +415,89 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 
 void PhysicsPlayground::Update()
 {
-	bulletStuff:
-	int active = spawnCount - deletedBullets;
-	bool hasDespawned;
+	for (int i = 0; i < enemies.size(); i++) {
+		bool defeated = (ECS::GetComponent<ToBeDestroyed>(enemies[i]).m_ded);
+
+		if (defeated) {
+			ECS::GetComponent<PhysicsBody>(enemies[i]).DeleteBody();
+			ECS::DestroyEntity(enemies[i]);
+			enemies.erase(enemies.begin() + i);
+
+			/*
+			ECS::GetComponent<PhysicsBody>(shotTriggers[i]).DeleteBody();
+			ECS::DestroyEntity(shotTriggers[i]);
+			shotTriggers.erase(shotTriggers.begin() + i);
 
 
-	if (active > 0) {
-		for (int i = deletedBullets; i < spawnCount; i++) {
-			
-			hasDespawned = false;
-			auto& bPos = ECS::GetComponent<PhysicsBody>(bullet[i]);
-			
-			for (int j = 0; j < enemies.size(); j++) {
-				if (!hasDespawned) {
-
-					auto& ePos = ECS::GetComponent<PhysicsBody>(enemies[j]);
-					int maxX = ePos.GetBody()->GetPosition().x + 13;
-					int minX = ePos.GetBody()->GetPosition().x - 13;
-					int maxY = ePos.GetBody()->GetPosition().y + 9;
-					int minY = ePos.GetBody()->GetPosition().y - 9;
-
-
-					if (bPos.GetBody()->GetPosition().x < maxX && bPos.GetBody()->GetPosition().x > minX
-						&& bPos.GetBody()->GetPosition().y < maxY && bPos.GetBody()->GetPosition().y > minY) {
-						
-						/*if (ECS::GetComponent<PhysicsBody>(hostileBullets[j]).GetVelocity().x == 0) {
-							ECS::DestroyEntity(hostileBullets[j]);
-							hostileBullets.erase(hostileBullets.begin() + j);
-						}*/
-						
-						//ECS::GetComponent<PhysicsBody>(shotTriggers[j]).SetPosition(b2Vec2(-5.f, 0.f));
-						//shotTriggers.erase(shotTriggers.begin() + j);
-						ECS::DestroyEntity(enemies[j]);
-						enemies.erase(enemies.begin() + j);
-						ECS::DestroyEntity(bullet[i]);
-						bullet.erase(bullet.begin() + i);
-
-						hasDespawned = true;
-						deletedBullets++;
-
-						score += 500;
-						std::cout << '\n' << score << '\n';
-					}
-				}
+			if (ECS::GetComponent<PhysicsBody>(hostileBullets[i]).GetVelocity().x == 0) {
+				ECS::GetComponent<PhysicsBody>(hostileBullets[i]).DeleteBody();
+				ECS::DestroyEntity(hostileBullets[i]);
+				hostileBullets.erase(hostileBullets.begin() + i);
 			}
-
-			if (!hasDespawned) {
-					auto& player = ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer());
-					if (bPos.GetBody()->GetPosition().x < (player.GetBody()->GetPosition().x - 60) 
-						|| bPos.GetBody()->GetPosition().x > (player.GetBody()->GetPosition().x + 200)
-						|| bPos.GetBody()->GetPosition().y < (player.GetBody()->GetPosition().y - 60) 
-						|| bPos.GetBody()->GetPosition().y > (player.GetBody()->GetPosition().y + 200)) {
-						
-						ECS::DestroyEntity(bullet[i]);
-						bullet.erase(bullet.begin() + i);
-						hasDespawned = true;
-						deletedBullets++;
-					}
-
-				}
-
-			if (hasDespawned) {
-				std::cout << "\nzap!\n";
-				goto bulletStuff;
-			}
+			*/
 		}
-
-		//std::cout << '\n' << bullet[0] << " " << enemies[0] << " " << shotTriggers[0];
-
 	}
 
 
-}
-PhysicsPlaygroundListener timer;
+	if (activeBullets.size() > 1) {
+		for (int i = 1; i < activeBullets.size(); i++) {
+			bool inactive = ECS::GetComponent<IsInactive>(activeBullets[i]).m_notInUse;
 
+			if (inactive) {
+				ECS::GetComponent<PhysicsBody>(activeBullets[i]).SetVelocity(vec3(0.f, 0.f, 0.f));
+				ECS::GetComponent<PhysicsBody>(activeBullets[i]).SetPosition(b2Vec2(100, 300));
+				bulletHold.push_back(activeBullets[i]);
+				activeBullets.erase(activeBullets.begin() + i);
+			}
+		}
+	}
+
+}
+
+void PhysicsPlayground::Aiming(vec2 mousePosition)
+{
+	vec3 playerLoc = ECS::GetComponent<Transform>(MainEntities::MainPlayer()).GetPosition();
+
+	vec2 convertedMouse = mousePosition;
+
+	float dx = playerLoc.x - convertedMouse.x;
+	float dy = playerLoc.y - convertedMouse.y;
+	std::cout << convertedMouse.x << " | " << convertedMouse.y << "\n";
+	mouseLocation = b2Vec2(convertedMouse.x, convertedMouse.y);
+	float playerDir = (atan2(dy, dx));
+
+//	//Try get will attempt to get the component, if it doesn't exist it'll be a nullptr
+//	auto body = ECS::m_reg->try_get<PhysicsBody>(MainEntities::MainPlayer());
+//
+//	//thus we can actually check if it's a nullptr to know if we have a body
+//	if (body != nullptr)
+//	{
+//		body->GetBody()->SetTransform(body->GetPosition(), playerDir - Transform::ToRadians(180.f));
+//	}
+//	else
+//	{
+//		ECS::GetComponent<Transform>(MainEntities::MainPlayer()).SetRotationAngleZ(playerDir - Transform::ToRadians(180.f));
+//	}
+}
+
+void PhysicsPlayground::MouseMotion(SDL_MouseMotionEvent evnt)
+{
+	
+	Aiming(Util::ConvertToGL(m_sceneReg, vec2(float(evnt.x), float(evnt.y))));
+}
+
+void PhysicsPlayground::MouseClick(SDL_MouseButtonEvent evnt)
+{
+	
+	if (evnt.state == SDL_PRESSED)
+	{
+		Aiming(Util::ConvertToGL(m_sceneReg, vec2(float(evnt.x), float(evnt.y))));
+		fireBullet();
+
+	}
+}
+
+PhysicsPlaygroundListener timer;
 void PhysicsPlayground::KeyboardHold()
 {
 	auto& player = ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer());
@@ -502,6 +515,7 @@ void PhysicsPlayground::KeyboardHold()
 		//std::cout << bullet[0] << " " << enemies[0] << " " << shotTriggers[0] << '\n';
 		//std::cout << bullet[1] << " " << enemies[1] << " " << shotTriggers[1] << '\n';
 	}
+
 	if (player.GetPosition().y <= 20.015) {
 		canJump.m_canJump = true;
 	}
@@ -527,10 +541,6 @@ void PhysicsPlayground::KeyboardHold()
 			canJump.m_canJump = false;
 		}
 	}
-	if (Input::GetKey(Key::U))
-	{
-		std::cout << player.GetPosition().y;
-	}
 	player.SetVelocity(vec3(90, vel, 0));
 }
 
@@ -538,6 +548,7 @@ void PhysicsPlayground::KeyboardDown()
 {
 	auto& player = ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer());
 	auto& canJump = ECS::GetComponent<CanJump>(MainEntities::MainPlayer());
+	BulletPool shot;
 
 	if (Input::GetKeyDown(Key::Q))
 	{
@@ -551,7 +562,7 @@ void PhysicsPlayground::KeyboardDown()
 	
 
 	if (Input::GetKeyDown(Key::S)) {
-		fireBullet();
+		shot.create(player.GetBody()->GetPosition().x, player.GetBody()->GetPosition().y, 120, 0, 120);
 	}
 }
 
@@ -612,6 +623,41 @@ void PhysicsPlayground::makeStaticObject(std::string filename, int width, int he
 	tempPhsBody.SetRotationAngleDeg(rotate);
 }
 
+void PhysicsPlayground::makeMovingBarrier(int x, int y, int z, int physx, int physy)
+{
+	std::string fileName = "nothingness.png";
+
+	//Creates entity
+	auto entity = ECS::CreateEntity();
+
+	//Add components
+	ECS::AttachComponent<Sprite>(entity);
+	ECS::AttachComponent<Transform>(entity);
+	ECS::AttachComponent<PhysicsBody>(entity);
+
+	//Sets up components
+
+	ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 10, 300);
+	ECS::GetComponent<Transform>(entity).SetPosition(vec3(x, y, z));
+
+	auto& tempSpr = ECS::GetComponent<Sprite>(entity);
+	auto& tempPhsBody = ECS::GetComponent<PhysicsBody>(entity);
+
+	b2Body* tempBody;
+	b2BodyDef tempDef;
+	tempDef.type = b2_kinematicBody;
+	tempDef.position.Set(float32(physx), float32(physy));
+
+	tempBody = m_physicsWorld->CreateBody(&tempDef);
+
+	tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth()),
+		float(tempSpr.GetHeight()), vec2(0.f, 0.f), false, BOUNDARY, BULLET);
+	tempPhsBody.SetColor(vec4(2, 1, 0, 0.3));
+	tempPhsBody.SetGravityScale(0.f);
+	tempPhsBody.SetVelocity(vec3(90, 0, 0));
+	tempPhsBody.SetFixedRotation(true);
+
+}
 
 void PhysicsPlayground::makeShotTrigger(int index, int x, int y, int z, int physX, int physY)
 {
@@ -670,6 +716,7 @@ void PhysicsPlayground::makeEnemy(int index, int x, int y, float physx, float ph
 	ECS::AttachComponent<Transform>(entity);
 	ECS::AttachComponent<PhysicsBody>(entity);
 	ECS::AttachComponent<CanJump>(entity);
+	ECS::AttachComponent<ToBeDestroyed>(entity);
 
 	//Sets up the components
 	std::string fileName = "Concept_Design_ENEMY.png";
@@ -687,7 +734,7 @@ void PhysicsPlayground::makeEnemy(int index, int x, int y, float physx, float ph
 
 	tempBody = m_physicsWorld->CreateBody(&tempDef);
 
-	tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkx), float(tempSpr.GetHeight() - shrinky), vec2(-2.f, 0.f), false, ENEMY, ENVIRONMENT | GROUND, 0.5f, 3.f);
+	tempPhsBody = PhysicsBody(entity, tempBody, float(tempSpr.GetWidth() - shrinkx), float(tempSpr.GetHeight() - shrinky), vec2(-2.f, 0.f), false, ENEMY, ENVIRONMENT | GROUND | BULLET, 0.5f, 3.f);
 	tempPhsBody.SetRotationAngleDeg(0.f);
 	tempPhsBody.SetFixedRotation(true);
 	tempPhsBody.SetColor(vec4(1.f, 0.f, 1.f, 0.3f));
@@ -698,14 +745,15 @@ void PhysicsPlayground::makeEnemy(int index, int x, int y, float physx, float ph
 void PhysicsPlayground::makeBullet(int index) {
 
 	std::string fileName = "Bullet.png";
-	vec3 source(-100, 10, 3);
-	auto entity = bullet[index];
+	vec3 source(100, 300, 3);
+	auto entity = bulletHold[index];
 
 	tempBullet = entity;
 
 	ECS::AttachComponent<Sprite>(entity);
 	ECS::AttachComponent<Transform>(entity);
 	ECS::AttachComponent<PhysicsBody>(entity);
+	ECS::AttachComponent<IsInactive>(entity);
 
 	ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 5, 5);
 	ECS::GetComponent<Transform>(entity).SetPosition(source);
@@ -720,9 +768,10 @@ void PhysicsPlayground::makeBullet(int index) {
 
 	tempBody = m_physicsWorld->CreateBody(&tempDef);
 
-	tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetHeight()) / 2.f), vec2(0.f, 0.f), false, OBJECTS, TRIGGER);
+	tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetHeight()) / 2.f), vec2(0.f, 0.f), false, BULLET, ENEMY | BOUNDARY);
 	tempPhsBody.SetColor(vec4(1, 0, 0, 0.3));
 	tempPhsBody.SetRotationAngleDeg(0);
+	tempPhsBody.SetFixedRotation(true);
 	tempPhsBody.SetGravityScale(0.f);
 
 }
@@ -730,15 +779,30 @@ void PhysicsPlayground::makeBullet(int index) {
 void PhysicsPlayground::fireBullet() {
 	b2Vec2 source((ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer()).GetBody()->GetPosition().x + 10),
 		(ECS::GetComponent<PhysicsBody>(MainEntities::MainPlayer()).GetBody()->GetPosition().y));
+	int bulletToShoot;
+	if (bulletHold.size() > 1) 
+	{
+		activeBullets.push_back(bulletHold[1]);
+		bulletHold.erase(bulletHold.begin() + 1);
+	}
+	else
+	{
+		bulletToShoot = activeBullets[1];
+		activeBullets.push_back(bulletToShoot);
+		activeBullets.erase(activeBullets.begin() + 1);
+	}
+	bulletToShoot = activeBullets.size() - 1;
 
-	auto& pBullet = ECS::GetComponent<PhysicsBody>(bullet[spawnCount]);
+
+
+	ECS::GetComponent<IsInactive>(activeBullets[bulletToShoot]).m_notInUse = false;
+	auto& pBullet = ECS::GetComponent<PhysicsBody>(activeBullets[bulletToShoot]);
 	pBullet.SetPosition(b2Vec2(source));
 	
 	spawnCount++;
 
-	vec2 targetCoord(pBullet.GetBody()->GetPosition().x + 100, pBullet.GetBody()->GetPosition().y);
+	vec2 targetCoord(mouseLocation.x, mouseLocation.y);
 	vec2 startCoord(pBullet.GetBody()->GetPosition().x, pBullet.GetBody()->GetPosition().y);
-
 	b2Vec2 shotVect(targetCoord.x - startCoord.x, targetCoord.y - startCoord.y);
 	b2Vec2 unitVect = shotVect;
 	double divisor = sqrt(pow(shotVect.x, 2) + pow(shotVect.y, 2));

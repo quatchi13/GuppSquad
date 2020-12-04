@@ -46,6 +46,36 @@ void PhysicsPlaygroundListener::BeginContact(b2Contact* contact)
 			
 		}
 	}
+	if ((filterA.categoryBits == ENEMY && filterB.categoryBits == BULLET) || (filterB.categoryBits == ENEMY && filterA.categoryBits == BULLET))
+	{
+		if (filterA.categoryBits == ENEMY)
+		{
+			//ECS::DestroyEntity((int)fixtureA->GetBody()->GetUserData());
+			ECS::GetComponent<ToBeDestroyed>((int)fixtureA->GetBody()->GetUserData()).m_ded = true;
+			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_notInUse = true;
+			std::cout << "ded";
+		}
+		else if (filterB.categoryBits == ENEMY)
+		{
+			ECS::GetComponent<ToBeDestroyed>((int)fixtureB->GetBody()->GetUserData()).m_ded = true;
+			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_notInUse = true;
+			std::cout << "ded";
+		}
+	}
+
+	if ((filterA.categoryBits == BULLET && filterB.categoryBits == BOUNDARY) || (filterB.categoryBits == BULLET && filterA.categoryBits == BOUNDARY))
+	{
+		if (filterA.categoryBits == BULLET)
+		{
+			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_notInUse = true;
+			std::cout << "nyoom";
+		}
+		else if (filterB.categoryBits == BULLET)
+		{
+			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_notInUse = true;
+			std::cout << "nyoom";
+		}
+	}
 
 }
 
