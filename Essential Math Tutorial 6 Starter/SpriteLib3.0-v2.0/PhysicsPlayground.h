@@ -41,6 +41,8 @@ public:
 
 	void makeMovingBarrier(int x, int y, int z, int physx, int physy);
 
+	void makeHostileBullet(int index, int x, int y);
+
 	b2Vec2 mouseLocation;
 
 	void fireBullet();

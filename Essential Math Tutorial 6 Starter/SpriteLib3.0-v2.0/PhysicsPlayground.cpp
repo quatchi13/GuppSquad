@@ -100,62 +100,18 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		tempPhsBody.SetRotationAngleDeg(0.f);
 		tempPhsBody.SetFixedRotation(true);
 		tempPhsBody.SetColor(vec4(1.f, 0.f, 1.f, 0.3f));
-		tempPhsBody.SetGravityScale(10.f);
+		tempPhsBody.SetGravityScale(40.f);
 	}
 
-	{
-		for (int i = 0; i < 2; i++) {
-			std::string fileName = "LinkStandby.png";
-			int x, y;
 
-			switch (i) {
-			case 0:
-				x = 390;
-				y = 55;
-				hostileBullets.erase(hostileBullets.begin());
-				break;
-			default:
-				x = 900;
-				y = 35;
-			}
-
-			auto entity = ECS::CreateEntity();
-			hostileBullets.push_back(entity);
-
-			ECS::AttachComponent<Sprite>(entity);
-			ECS::AttachComponent<Transform>(entity);
-			ECS::AttachComponent<PhysicsBody>(entity);
-
-			ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 5, 5);
-			ECS::GetComponent<Transform>(entity).SetPosition(100, 50, 3);
-
-			auto& tempSpr = ECS::GetComponent<Sprite>(entity);
-
-			tempSpr.SetTransparency(0.f);
-
-			auto& tempPhsBody = ECS::GetComponent<PhysicsBody>(entity);
-
-			b2Body* tempBody;
-			b2BodyDef tempDef;
-			tempDef.type = b2_dynamicBody;
-			tempDef.position.Set(x, y);
-
-			tempBody = m_physicsWorld->CreateBody(&tempDef);
-
-			tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetWidth()) / 2.f), vec2(0.f, 0.f), false, EBULLET, PLAYER);
-			tempPhsBody.SetColor(vec4(1, 0, 0, 0.3));
-			tempPhsBody.SetRotationAngleDeg(0);
-			tempPhsBody.SetGravityScale(0.f);
-
-		}
-	}
+	
 
 	makeStaticObject("nothingness.png", 15000000, 10, 30, -20, 2, 0, 115, 0, 0, BOUNDARY, 1, 3, 0, 0.3, 0);
 	makeStaticObject("nothingness.png", 15000000, 10, 30, -20, 2, 0, -35, 0, 0, BOUNDARY, 1, 3, 0, 0.3, 0);
 	makeMovingBarrier(30, -20, 2, 235, 0);
 	makeMovingBarrier(30, -20, 2, -50, 0);
 
-	makeImage("Background.png", 3000, 250, 1, 850, 0, -4);
+	makeImage("Background.png", 40000, 150, 1, 4050, 40, -4);
 
 	//Setup static Top Platform
 	makeStaticObject("White_Platform.png", 15000000, 15, 30, -30, 2, 0, 0, 0, 0, GROUND, 0, 1, 0, 0.3, 0);
@@ -273,6 +229,18 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 	makeEnemy(2, 18, 25, 1300, -28, 0, 0, 1, 0, 0, 0.3);
 	makeEnemy(3, 18, 25, 1500, -28, 0, 0, 1, 0, 0, 0.3);
 	makeEnemy(4, 18, 25, 1700, 72, 0, 0, 1, 0, 0, 0.3);
+
+	makeHostileBullet(0, 400, 55);
+	makeHostileBullet(1, 900, 35);
+	makeHostileBullet(2, 1300, 35);
+	makeHostileBullet(3, 1500, 35);
+	makeHostileBullet(4, 1700, 35);
+
+	makeShotTrigger(0, 30, -20, 80, 280, -30);
+	makeShotTrigger(1, 30, -20, 80, 780, -30);
+	makeShotTrigger(1, 30, -20, 80, 1180, -30);
+	makeShotTrigger(1, 30, -20, 80, 1380, -30);
+	makeShotTrigger(1, 30, -20, 80, 1580, -30);
 	//second segment
 	makeEnemy(5, 18, 25, 2000, -28, 0, 0, 1, 0, 0, 0.3);
 	makeEnemy(6, 18, 25, 2100, -28, 0, 0, 1, 0, 0, 0.3);
@@ -403,8 +371,7 @@ void PhysicsPlayground::InitScene(float windowWidth, float windowHeight)
 		makeBullet(i + 1);
 	}
 	//Setup trigger
-	makeShotTrigger(0, 30, -20, 80, 280, -30);
-	makeShotTrigger(1, 30, -20, 80, 700, -30);
+	
 	//makeTriggerEnemy(0, 400, 22, shotTriggers[0]);
 
 	ECS::GetComponent<HorizontalScroll>(MainEntities::MainCamera()).SetFocus(&ECS::GetComponent<Transform>(MainEntities::MainPlayer()));
@@ -528,7 +495,7 @@ void PhysicsPlayground::KeyboardHold()
 		{
 			if (timer.GetTimer() < 0.4) {
 				 timer.AddTime(Timer::deltaTime);
-				vel += 70;
+				vel += 140;
 			}
 			else
 			{
@@ -541,7 +508,7 @@ void PhysicsPlayground::KeyboardHold()
 			canJump.m_canJump = false;
 		}
 	}
-	player.SetVelocity(vec3(90, vel, 0));
+	player.SetVelocity(vec3(70, vel, 0));
 }
 
 void PhysicsPlayground::KeyboardDown()
@@ -654,7 +621,7 @@ void PhysicsPlayground::makeMovingBarrier(int x, int y, int z, int physx, int ph
 		float(tempSpr.GetHeight()), vec2(0.f, 0.f), false, BOUNDARY, BULLET);
 	tempPhsBody.SetColor(vec4(2, 1, 0, 0.3));
 	tempPhsBody.SetGravityScale(0.f);
-	tempPhsBody.SetVelocity(vec3(90, 0, 0));
+	tempPhsBody.SetVelocity(vec3(70, 0, 0));
 	tempPhsBody.SetFixedRotation(true);
 
 }
@@ -772,6 +739,42 @@ void PhysicsPlayground::makeBullet(int index) {
 	tempPhsBody.SetColor(vec4(1, 0, 0, 0.3));
 	tempPhsBody.SetRotationAngleDeg(0);
 	tempPhsBody.SetFixedRotation(true);
+	tempPhsBody.SetGravityScale(0.f);
+
+}
+
+void PhysicsPlayground::makeHostileBullet(int index, int x, int y) {
+	std::string fileName = "EBullet.png";
+
+	auto entity = ECS::CreateEntity();
+	hostileBullets.push_back(entity);
+	if (index == 0) {
+		hostileBullets.erase(hostileBullets.begin());
+	}
+
+
+	ECS::AttachComponent<Sprite>(entity);
+	ECS::AttachComponent<Transform>(entity);
+	ECS::AttachComponent<PhysicsBody>(entity);
+
+	ECS::GetComponent<Sprite>(entity).LoadSprite(fileName, 5, 5);
+	ECS::GetComponent<Transform>(entity).SetPosition(100, 50, 3);
+
+	auto& tempSpr = ECS::GetComponent<Sprite>(entity);
+
+	tempSpr.SetTransparency(0.f);
+
+	auto& tempPhsBody = ECS::GetComponent<PhysicsBody>(entity);
+
+	b2Body* tempBody;
+	b2BodyDef tempDef;
+	tempDef.type = b2_dynamicBody;
+	tempDef.position.Set(x, y);
+
+	tempBody = m_physicsWorld->CreateBody(&tempDef);
+	tempPhsBody = PhysicsBody(entity, tempBody, float((tempSpr.GetWidth()) / 2.f), vec2(0.f, 0.f), false, EBULLET, PLAYER);
+	tempPhsBody.SetColor(vec4(1, 0, 0, 0.3));
+	tempPhsBody.SetRotationAngleDeg(0);
 	tempPhsBody.SetGravityScale(0.f);
 
 }
