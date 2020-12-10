@@ -17,5 +17,6 @@ private:
 	float timer = 0;
 	void TriggerEnter(b2Fixture* sensor);
 	void TriggerExit(b2Fixture* sensor);
+	int score = 0;
 };
 

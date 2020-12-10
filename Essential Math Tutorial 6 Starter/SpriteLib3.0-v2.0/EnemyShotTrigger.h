@@ -9,6 +9,5 @@ public:
 	void OnExit() override;
 protected:
 
-	bool triggered = false;
 };
 

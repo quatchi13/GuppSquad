@@ -51,15 +51,17 @@ void PhysicsPlaygroundListener::BeginContact(b2Contact* contact)
 		if (filterA.categoryBits == ENEMY)
 		{
 			//ECS::DestroyEntity((int)fixtureA->GetBody()->GetUserData());
-			ECS::GetComponent<ToBeDestroyed>((int)fixtureA->GetBody()->GetUserData()).m_ded = true;
+			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_ready = true;
 			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_notInUse = true;
-			std::cout << "ded";
+			score += 700;
+			std::cout << "Score: " << score << '\n';
 		}
 		else if (filterB.categoryBits == ENEMY)
 		{
-			ECS::GetComponent<ToBeDestroyed>((int)fixtureB->GetBody()->GetUserData()).m_ded = true;
+			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_ready = true;
 			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_notInUse = true;
-			std::cout << "ded";
+			score += 700;
+			std::cout << "Score: " << score << '\n';
 		}
 	}
 
@@ -68,12 +70,41 @@ void PhysicsPlaygroundListener::BeginContact(b2Contact* contact)
 		if (filterA.categoryBits == BULLET)
 		{
 			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_notInUse = true;
-			std::cout << "nyoom";
+			
 		}
 		else if (filterB.categoryBits == BULLET)
 		{
 			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_notInUse = true;
-			std::cout << "nyoom";
+		}
+	}
+
+	if ((filterA.categoryBits == EBULLET && filterB.categoryBits == BOUNDARY) || (filterB.categoryBits == EBULLET && filterA.categoryBits == BOUNDARY))
+	{
+		if (filterA.categoryBits == EBULLET)
+		{
+			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_despawned = true;
+			
+		}
+		else if (filterB.categoryBits == EBULLET)
+		{
+			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_despawned = true;
+			
+		}
+	}
+
+	if ((filterA.categoryBits == EBULLET && filterB.categoryBits == PLAYER) || (filterB.categoryBits == EBULLET && filterA.categoryBits == PLAYER))
+	{
+		if (filterA.categoryBits == EBULLET)
+		{
+			ECS::GetComponent<IsInactive>((int)fixtureA->GetBody()->GetUserData()).m_despawned = true;
+			score -= 300;
+			std::cout << "Score: " << score << '\n';
+		}
+		else if (filterB.categoryBits == EBULLET)
+		{
+			ECS::GetComponent<IsInactive>((int)fixtureB->GetBody()->GetUserData()).m_despawned = true;
+			score -= 300;
+			std::cout << "Score: " << score << '\n';
 		}
 	}
 
